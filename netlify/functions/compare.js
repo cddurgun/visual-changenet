@@ -2,7 +2,7 @@ const fetch = require('node-fetch');
 const { v4: uuidv4 } = require('uuid');
 
 const NVAI_URL = "https://ai.api.nvidia.com/v1/cv/nvidia/visual-changenet";
-const HEADER_AUTH = "Bearer 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";
+const HEADER_AUTH = `Bearer ${process.env.NVIDIA_API_KEY || "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"}`;
 
 async function uploadAsset(imageBuffer, description) {
   // Authorize upload
