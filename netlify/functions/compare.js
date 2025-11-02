@@ -84,11 +84,13 @@ exports.handler = async function(event, context) {
       'base64'
     );
 
-    console.log('Uploading reference image...');
+    console.log('Uploading reference image...', referenceBuffer.length, 'bytes');
     const assetId1 = await uploadAsset(referenceBuffer, "Reference Image");
+    console.log('Reference asset ID:', assetId1);
 
-    console.log('Uploading test image...');
+    console.log('Uploading test image...', testBuffer.length, 'bytes');
     const assetId2 = await uploadAsset(testBuffer, "Test Image");
+    console.log('Test asset ID:', assetId2);
 
     // Prepare API request
     const inputs = {
@@ -97,7 +99,8 @@ exports.handler = async function(event, context) {
     };
     const assetList = `${assetId1}, ${assetId2}`;
 
-    console.log('Requesting change detection...');
+    console.log('Requesting change detection with inputs:', inputs);
+    console.log('Asset list:', assetList);
     const compareResponse = await fetch(NVAI_URL, {
       method: 'POST',
       headers: {
@@ -110,7 +113,9 @@ exports.handler = async function(event, context) {
     });
 
     if (!compareResponse.ok) {
-      throw new Error(`API request failed: ${await compareResponse.text()}`);
+      const errorText = await compareResponse.text();
+      console.error('API Error:', errorText);
+      throw new Error(`API request failed (${compareResponse.status}): ${errorText}`);
     }
 
     // Get the zip file
